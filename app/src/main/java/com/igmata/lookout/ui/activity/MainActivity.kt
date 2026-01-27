@@ -1,5 +1,6 @@
 package com.igmata.lookout.ui.activity
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -12,19 +13,18 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.igmata.lookout.R
 import com.igmata.lookout.database.LookOutDB
 import com.igmata.lookout.database.entity.Location
-import com.igmata.lookout.ui.element.LocationElement
 import com.igmata.lookout.ui.element.LocationItem
 import com.igmata.lookout.ui.theme.Black
 import com.igmata.lookout.ui.theme.LookOutTheme
@@ -33,48 +33,36 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
-
-    val db by lazy { LookOutDB.getInstance(this) }
-    val locationsDao by lazy { db.locations() }
-    val contactsDao by lazy { db.contacts() }
-
-    val locations = mutableStateListOf<Location>()
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        lifecycleScope.launch(Dispatchers.IO) {
+        setContent {
+            MainContent()
+        }
+    }
+}
+
+class MainViewModel(context: Context): ViewModel() {
+    val db by lazy { LookOutDB.getInstance(context) }
+    val locationsDao by lazy { db.locations() }
+    var connected = false
+
+    fun getLocations(): List<Location> {
+        val locations = mutableListOf<Location>()
+        viewModelScope.launch(Dispatchers.IO) {
             //locationsDao.insert(Location(0,0,0.0, 0.0))
             locations.addAll(locationsDao.getAll())
         }
-
-        val locationItems = mutableStateListOf<LocationItem>()
-
-        setContent {
-            val config = LocalConfiguration.current
-            val width = config.screenWidthDp
-            val height = config.screenHeightDp
-
-            locations.forEach {
-                locationItems.add(LocationItem(it, width, height))
-            }
-            TheContent(locationItems)
-        }
-
-        Thread {
-            while (true) {
-                locationItems.forEach {
-                    it.location.longitudea += 10
-                }
-                Thread.sleep(1000)
-            }
-        }.start()
+        return locations
     }
 }
 
 @Composable
-fun TheContent(items: List<LocationItem>) {
+fun MainContent() {
+    val context = LocalContext.current
+    val viewModel = MainViewModel(context)
+
     LookOutTheme {
         Box(
             modifier = Modifier
@@ -86,9 +74,9 @@ fun TheContent(items: List<LocationItem>) {
                 modifier = Modifier
                     .fillMaxSize()
             ) {
-                items.forEach {
+                /*viewModel.getLocations().forEach {
                     LocationElement(item = it)
-                }
+                }*/
             }
         }
     }
@@ -117,10 +105,10 @@ fun Preview() {
 
     items.add(
         LocationItem(
-            Location(1,1,0.0, 0.0),
+            Location("1","Zu",0.0, 0.0),
             width,
             height
         )
     )
-    TheContent(items)
+    MainContent()
 }

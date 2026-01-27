@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "185794919572",
+    "project_id": "lookout-5e114",
+    "storage_bucket": "lookout-5e114.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:185794919572:android:2a3119b8f405fe75940881",
+        "android_client_info": {
+          "package_name": "com.igmata.lookout"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDvhygBGaaDG6w8lihrqt0ijyxobTBsmxY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

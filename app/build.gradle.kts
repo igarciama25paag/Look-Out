@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     id("com.google.devtools.ksp")
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -51,6 +52,9 @@ dependencies {
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.foundation.layout)
+    implementation(libs.firebase.storage)
+    implementation(libs.firebase.database)
+    implementation(libs.firebase.analytics)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -59,6 +63,7 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 
+    // Room
     val roomv = "2.8.4"
     implementation("androidx.room:room-runtime:$roomv")
     ksp("androidx.room:room-compiler:$roomv")
@@ -68,4 +73,7 @@ dependencies {
     implementation("androidx.room:room-guava:$roomv")
     testImplementation("androidx.room:room-testing:$roomv")
     implementation("androidx.room:room-paging:$roomv")
+
+    // Firebase
+    implementation(platform("com.google.firebase:firebase-bom:34.8.0"))
 }

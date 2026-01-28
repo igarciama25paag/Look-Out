@@ -27,8 +27,8 @@ fun LocationElement(
     val y = remember { mutableIntStateOf((vc + item.location.latitudea).toInt()) }
 
     Image(
-        painter = painterResource(R.drawable.ic_contact),
-        contentDescription = "ic_contact",
+        painter = painterResource(R.drawable.ic_location),
+        contentDescription = "ic_location",
         modifier = Modifier
             .offset(x.intValue.dp,y.intValue.dp)
             .size(SIZE.dp)

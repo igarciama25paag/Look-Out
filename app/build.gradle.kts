@@ -63,6 +63,9 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 
+    // GPS
+    implementation("com.google.android.gms:play-services-location:21.0.1")
+
     // Room
     val roomv = "2.8.4"
     implementation("androidx.room:room-runtime:$roomv")

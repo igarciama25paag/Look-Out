@@ -39,7 +39,7 @@ class Connection(
         }
     }
 
-    // Room kokalekuak lortu
+    // Room kokapenak lortu
     private val db by lazy { LookOutDB.Companion.getInstance(lifecycleOwner as Context) }
     private val locationsDao by lazy { db.locations() }
 
@@ -59,20 +59,21 @@ class Connection(
         consRef.value.child(ConnectionId!!).onDisconnect().removeValue()
 
         // Konexio berria
-        newLocationElement()
+        sendNewLocation()
         Connected = true
 
         Log.d("Firebase", "Konektatuta")
 
-        // Longitudea eta latitudea lortu 6 segunduro
+        // Longitudea eta latitudea lortu 5 segunduro
         CoroutineScope(Dispatchers.IO).launch {
             while (Connected) {
-                /*Gps.getLocation(lifecycleOwner as Context) { lat, lon ->
+                Gps.getLocation(lifecycleOwner as Context) { lat, lon ->
                     Longitudea = lon
                     Latitudea = lat
-                }*/
-                Log.d("Look Out", "Kokalekua eskatu")
-                Thread.sleep(6000)
+                }
+                sendNewLocation()
+                Log.d("Look Out", "Kokapena eskatu: lat=${Latitudea} lon=${Longitudea}")
+                Thread.sleep(5000)
             }
         }
     }
@@ -80,8 +81,8 @@ class Connection(
     // Firebase-etik deskonektatu
     fun disconnect() {
 
-        // Firebase Listeners ezabatu
-        fbdb.value.removeEventListener(dbDataChangeEvent)
+        // Firebase Listener ezabatu
+        consRef.value.removeEventListener(dbDataChangeEvent)
 
         // Firebase-eko erregistroa ezabatu
         ConnectionId?.let { id ->
@@ -95,10 +96,10 @@ class Connection(
         Log.d("Firebase", "Deskonektatuta")
     }
 
-    // Firebase-en kokaleku elementu berria bat sortu
-    private fun newLocationElement() {
+    // Firebase-ri kokapen berria bat sortbidali
+    private fun sendNewLocation() {
 
-        // Kokaleku berria muntatu
+        // Kokapen berria muntatu
         val newCon = hashMapOf(
             "sortze_data" to ServerValue.TIMESTAMP,
             "izena" to Izena,
@@ -106,7 +107,7 @@ class Connection(
             "latitudea" to Latitudea
         )
 
-        // Kokaleku berria Firebase-era igo
+        // Kokapen berria Firebase-era igo
         ConnectionId?.let { id ->
             fbdb.value.child("connections").child(id).setValue(newCon)
                 .addOnSuccessListener {
@@ -118,32 +119,35 @@ class Connection(
         }
     }
 
-    // Firebase kokalekuak aldatzerako gertaera
+    // Firebase kokapenak aldatzerako gertaera
     private val dbDataChangeEvent = object : ValueEventListener {
         override fun onDataChange(snapshot: DataSnapshot) {
             lifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
 
                 // Room eta Firebase datuak hartu
                 val localLocations = locationsDao.getAll()
+                //snapshot.children.removeAll { it.key == ConnectionId }
                 val firebaseKeys = snapshot.children.map { it.key.toString() }
 
-                // Existitzen ez diren kokalekuak ezabatu
+                // Existitzen ez diren kokapenak ezabatu
                 localLocations.forEach { local ->
                     if (!firebaseKeys.contains(local.id))
                         locationsDao.delete(local)
                 }
 
-                // Kokalekuak eguneratu edo gehitu
+                // Kokapenak eguneratu edo gehitu
                 snapshot.children.forEach { fbLocation ->
-                    val id = fbLocation.key ?: return@forEach
-                    locationsDao.upsert(
-                        Location(
-                            id,
-                            fbLocation.child("izena").getValue(String::class.java) ?: "null",
-                            fbLocation.child("longitudea").getValue(Double::class.java) ?: 0.0,
-                            fbLocation.child("latitudea").getValue(Double::class.java) ?: 0.0
+                    if (fbLocation.key != ConnectionId) {
+                        val id = fbLocation.key ?: return@forEach
+                        locationsDao.upsert(
+                            Location(
+                                id,
+                                fbLocation.child("izena").getValue(String::class.java) ?: "null",
+                                fbLocation.child("longitudea").getValue(Double::class.java) ?: 0.0,
+                                fbLocation.child("latitudea").getValue(Double::class.java) ?: 0.0
+                            )
                         )
-                    )
+                    }
                 }
             }
         }

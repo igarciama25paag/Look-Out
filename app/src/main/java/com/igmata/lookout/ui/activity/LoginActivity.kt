@@ -1,7 +1,6 @@
 package com.igmata.lookout.ui.activity
 
 import android.Manifest
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -29,6 +28,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import com.igmata.lookout.ui.activity.ui.theme.LookOutTheme
@@ -39,7 +39,6 @@ class LoginActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        //connection.clear()
         enableEdgeToEdge()
         setContent {
             LookOutTheme {
@@ -48,15 +47,40 @@ class LoginActivity : ComponentActivity() {
         }
     }
 
-    class LoginViewModel(context: Context) : ViewModel() {
-        var izena = mutableStateOf("")
+    // LoginActivity-ko funtzioak
+    class LoginViewModel : ViewModel() {
+
+        // Konektatzeko botiaren click
+        fun conectClick(context: LoginActivity, izena: String) {
+            if (izena.isNotEmpty()) {
+                if (ContextCompat.checkSelfPermission(
+                        context,
+                        Manifest.permission.ACCESS_FINE_LOCATION
+                    )
+                    == PackageManager.PERMISSION_GRANTED
+                ) {
+                    context.connection.connect(izena)
+                    context.startActivity(Intent(context, MainActivity::class.java))
+                } else {
+                    Toast.makeText(context, "Kokapen baimena behar da", Toast.LENGTH_SHORT)
+                        .show()
+                    ActivityCompat.requestPermissions(
+                        context as ComponentActivity,
+                        arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                        0
+                    )
+                }
+            } else
+                Toast.makeText(context, "Izen bat sartu behar da", Toast.LENGTH_SHORT)
+                    .show()
+        }
     }
 
     @Composable
     fun LoginContent() {
         val context = LocalContext.current
-        val viewModel = LoginViewModel(context)
-        var izena by remember { viewModel.izena }
+        val viewModel = LoginViewModel()
+        var izena by remember { mutableStateOf("") }
 
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -78,16 +102,7 @@ class LoginActivity : ComponentActivity() {
             )
             Button(
                 onClick = {
-                    if (
-                        izena.isNotEmpty()
-                        && ContextCompat.checkSelfPermission(context,Manifest.permission.ACCESS_FINE_LOCATION)
-                            == PackageManager.PERMISSION_GRANTED
-                        ) {
-                        connection.connect(izena)
-                        context.startActivity(Intent(context, MainActivity::class.java))
-                    } else
-                        Toast.makeText(context, "Izen bat sartu behar da", Toast.LENGTH_SHORT)
-                            .show()
+                    viewModel.conectClick(context as LoginActivity, izena)
                 },
                 modifier = Modifier
                     .padding(7.dp)

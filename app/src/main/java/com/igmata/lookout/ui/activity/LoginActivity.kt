@@ -76,6 +76,14 @@ class LoginActivity : ComponentActivity() {
         }
     }
 
+    @Preview(showBackground = true)
+    @Composable
+    fun GreetingPreview() {
+        LookOutTheme {
+            LoginContent()
+        }
+    }
+
     @Composable
     fun LoginContent() {
         val context = LocalContext.current
@@ -110,14 +118,6 @@ class LoginActivity : ComponentActivity() {
             ) {
                 Text(text = "Konektatu", fontSize = 16.sp)
             }
-        }
-    }
-
-    @Preview(showBackground = true)
-    @Composable
-    fun GreetingPreview() {
-        LookOutTheme {
-            LoginContent()
         }
     }
 }

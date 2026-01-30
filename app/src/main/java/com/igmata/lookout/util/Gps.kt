@@ -50,9 +50,9 @@ class Gps {
             // Kokapena nola eskatzeko konfigurazioa
             val locationRequest = LocationRequest.Builder(
                 Priority.PRIORITY_HIGH_ACCURACY,
-                10000L
+                10000
             ).apply {
-                setMinUpdateIntervalMillis(5000L)
+                setMinUpdateIntervalMillis(5000)
                 setWaitForAccurateLocation(true)
             }.build()
 

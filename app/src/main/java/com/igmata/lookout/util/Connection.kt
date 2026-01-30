@@ -20,11 +20,13 @@ class Connection(
     val lifecycleOwner: LifecycleOwner
 ) {
     companion object {
+        var SendingInterval = 15000L
         var Connected: Boolean = false
         var ConnectionId: String? = null
         var Izena: String = ""
         var Longitudea: Double = 0.0
         var Latitudea: Double = 0.0
+        var Eskala: Int = 1
 
         // Firebase Realtime Database konexioa
         private val fbdb = lazy {
@@ -58,22 +60,24 @@ class Connection(
         // Deskonektatzerakoan erregistro berria ezabatu
         consRef.value.child(ConnectionId!!).onDisconnect().removeValue()
 
-        // Konexio berria
-        sendNewLocation()
         Connected = true
 
         Log.d("Firebase", "Konektatuta")
 
         // Longitudea eta latitudea lortu 5 segunduro
         CoroutineScope(Dispatchers.IO).launch {
+            Gps.getLocation(lifecycleOwner as Context) { lat, lon ->
+                Longitudea = lon
+                Latitudea = lat
+            }
+            Thread.sleep(10000)
             while (Connected) {
                 Gps.getLocation(lifecycleOwner as Context) { lat, lon ->
                     Longitudea = lon
                     Latitudea = lat
                 }
                 sendNewLocation()
-                Log.d("Look Out", "Kokapena eskatu: lat=${Latitudea} lon=${Longitudea}")
-                Thread.sleep(5000)
+                Thread.sleep(SendingInterval)
             }
         }
     }
@@ -111,7 +115,7 @@ class Connection(
         ConnectionId?.let { id ->
             fbdb.value.child("connections").child(id).setValue(newCon)
                 .addOnSuccessListener {
-                    Log.d("Firebase", "Konexio elementu berria -> Izena: '$Izena'  ID: $id")
+                    //Log.d("Firebase", "Konexio elementu berria -> Izena: '$Izena'  ID: $id")
                 }
                 .addOnFailureListener { error ->
                     Log.e("Firebase", "Error: ${error.message}")
@@ -126,7 +130,6 @@ class Connection(
 
                 // Room eta Firebase datuak hartu
                 val localLocations = locationsDao.getAll()
-                //snapshot.children.removeAll { it.key == ConnectionId }
                 val firebaseKeys = snapshot.children.map { it.key.toString() }
 
                 // Existitzen ez diren kokapenak ezabatu

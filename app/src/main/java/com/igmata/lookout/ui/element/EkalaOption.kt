@@ -21,7 +21,7 @@ fun EskalaOption() {
     var eskala by remember { mutableIntStateOf(Connection.Eskala) }
 
     Text(
-        text = "Eskala: " + eskala.toString() + "m",
+        text = "Eskala: 1:$eskala",
         fontSize = 20.sp,
         modifier = Modifier
             .padding(0.dp, 30.dp, 0.dp, 0.dp)

@@ -2,6 +2,7 @@ package com.igmata.lookout.util
 
 import android.content.Context
 import android.util.Log
+import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import com.google.firebase.Firebase
@@ -24,8 +25,8 @@ class Connection(
         var Connected: Boolean = false
         var ConnectionId: String? = null
         var Izena: String = ""
-        var Longitudea: Double = 0.0
-        var Latitudea: Double = 0.0
+        var Longitudea = mutableDoubleStateOf(0.0)
+        var Latitudea = mutableDoubleStateOf(0.0)
         var Eskala: Int = 1
 
         // Firebase Realtime Database konexioa
@@ -67,15 +68,16 @@ class Connection(
         // Longitudea eta latitudea lortu 5 segunduro
         CoroutineScope(Dispatchers.IO).launch {
             Gps.getLocation(lifecycleOwner as Context) { lat, lon ->
-                Longitudea = lon
-                Latitudea = lat
+                Longitudea.doubleValue = lon
+                Latitudea.doubleValue = lat
             }
-            Thread.sleep(10000)
+            Thread.sleep(5000)
             while (Connected) {
                 Gps.getLocation(lifecycleOwner as Context) { lat, lon ->
-                    Longitudea = lon
-                    Latitudea = lat
+                    Longitudea.doubleValue = lon
+                    Latitudea.doubleValue = lat
                 }
+                Longitudea.doubleValue += 0.0001
                 sendNewLocation()
                 Thread.sleep(SendingInterval)
             }
@@ -107,8 +109,8 @@ class Connection(
         val newCon = hashMapOf(
             "sortze_data" to ServerValue.TIMESTAMP,
             "izena" to Izena,
-            "longitudea" to Longitudea,
-            "latitudea" to Latitudea
+            "longitudea" to Longitudea.doubleValue,
+            "latitudea" to Latitudea.doubleValue
         )
 
         // Kokapen berria Firebase-era igo

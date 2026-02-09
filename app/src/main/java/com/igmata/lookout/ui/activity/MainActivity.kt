@@ -43,6 +43,7 @@ class MainActivity : ComponentActivity() {
         private val db by lazy { LookOutDB.Companion.getInstance(context) }
         private val locationsDao by lazy { db.locations() }
 
+        // Room DB-tik lortutako kokalekuak lortu 5 segunduro
         fun setupLocationsRetriever(context: MainActivity) {
             CoroutineScope(Dispatchers.IO).launch {
                 context.lifecycleScope.launch(Dispatchers.IO) {
@@ -57,6 +58,7 @@ class MainActivity : ComponentActivity() {
             }
         }
 
+        // Kokexioa piztu edo itzali
         fun connectionSwapper(viewModel: MainViewModel, context: MainActivity, isConnected: MutableState<Boolean>) {
             if (Connected) {
                 viewModel.connection.disconnect()
@@ -72,6 +74,7 @@ class MainActivity : ComponentActivity() {
             }
         }
 
+        // Erabiltzaile izena ezarri
         fun setIzena(izena: String, context: MainActivity) {
             if (!izena.isEmpty())
                 Connection.Izena = izena
@@ -95,6 +98,8 @@ class MainActivity : ComponentActivity() {
 
         val pagerState = rememberPagerState(0, 0f) { 2 }
         LookOutTheme {
+
+            // Aktibitateko orriak/fragmentuak
             HorizontalPager(
                 state = pagerState,
                 modifier = Modifier.fillMaxSize()

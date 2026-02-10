@@ -28,9 +28,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.paint
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -43,7 +40,6 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import com.igmata.lookout.R
 import com.igmata.lookout.ui.activity.ui.theme.LookOutTheme
-import com.igmata.lookout.ui.theme.Black
 import com.igmata.lookout.ui.theme.Blue
 import com.igmata.lookout.ui.theme.White
 import com.igmata.lookout.util.Connection
@@ -65,7 +61,7 @@ class LoginActivity : ComponentActivity() {
     class LoginViewModel : ViewModel() {
 
         // Konektatzeko botiaren click
-        fun conectClick(context: LoginActivity, izena: String) {
+        fun connectClick(context: LoginActivity, izena: String) {
             if (izena.isNotEmpty()) {
                 if (ContextCompat.checkSelfPermission(
                         context,
@@ -148,7 +144,7 @@ class LoginActivity : ComponentActivity() {
                 )
                 Button(
                     onClick = {
-                        viewModel.conectClick(context as LoginActivity, izena)
+                        viewModel.connectClick(context as LoginActivity, izena)
                     },
                     modifier = Modifier
                         .padding(7.dp)

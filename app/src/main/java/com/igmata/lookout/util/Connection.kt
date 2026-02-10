@@ -77,7 +77,6 @@ class Connection(
                     Longitudea.doubleValue = lon
                     Latitudea.doubleValue = lat
                 }
-                Longitudea.doubleValue += 0.0001
                 sendNewLocation()
                 Thread.sleep(SendingInterval)
             }

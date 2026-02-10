@@ -96,7 +96,7 @@ class MainActivity : ComponentActivity() {
         val viewModel = MainViewModel(context)
         viewModel.setupLocationsRetriever(context)
 
-        val pagerState = rememberPagerState(1, 0f) { 2 }
+        val pagerState = rememberPagerState(0, 0f) { 2 }
         LookOutTheme {
 
             // Aktibitateko orriak/fragmentuak
